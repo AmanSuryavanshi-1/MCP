@@ -1,0 +1,2230 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Model Context Protocol (MCP) - Complete Guide</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+
+  <style>
+      :root {
+          --primary: #0ea5e9;
+          --secondary: #8b5cf6;
+          --accent: #06b6d4;
+          --neutral: #64748b;
+          --base-100: #ffffff;
+          --base-200: #f8fafc;
+          --base-300: #e2e8f0;
+      }
+      
+      body {
+          font-family: 'Inter', sans-serif;
+          line-height: 1.6;
+          color: #334155;
+      }
+      
+      .serif {
+          font-family: 'Crimson Text', serif;
+      }
+      
+      .hero-gradient {
+          background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+      }
+      
+      .toc-sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 280px;
+          height: 100vh;
+          background: var(--base-100);
+          border-right: 1px solid var(--base-300);
+          overflow-y: auto;
+          z-index: 1000;
+          padding: 2rem 1.5rem;
+          box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+      }
+      
+      .main-content {
+          margin-left: 280px;
+          min-height: 100vh;
+      }
+      
+      .toc-link {
+          display: block;
+          padding: 0.5rem 0;
+          color: var(--neutral);
+          text-decoration: none;
+          border-left: 2px solid transparent;
+          padding-left: 1rem;
+          margin-left: -1rem;
+          transition: all 0.2s ease;
+      }
+      
+      .toc-link:hover, .toc-link.active {
+          color: var(--primary);
+          border-left-color: var(--primary);
+          background: rgba(14, 165, 233, 0.05);
+      }
+      
+      .toc-link.sub {
+          font-size: 0.875rem;
+          padding-left: 2rem;
+          margin-left: -1rem;
+      }
+      
+      .section-divider {
+          height: 1px;
+          background: linear-gradient(90deg, transparent, var(--base-300), transparent);
+          margin: 3rem 0;
+      }
+      
+      .code-block {
+          background: #1e293b;
+          color: #e2e8f0;
+          padding: 1.5rem;
+          border-radius: 0.5rem;
+          overflow-x: auto;
+          font-family: 'Monaco', 'Menlo', monospace;
+          font-size: 0.875rem;
+          line-height: 1.6;
+      }
+      
+      .highlight-box {
+          background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+          border-left: 4px solid var(--primary);
+          padding: 1.5rem;
+          margin: 2rem 0;
+          border-radius: 0 0.5rem 0.5rem 0;
+      }
+      
+      .benefit-card {
+          background: var(--base-100);
+          border: 1px solid var(--base-300);
+          border-radius: 0.75rem;
+          padding: 1.5rem;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+      
+      .benefit-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+          border-color: var(--primary);
+      }
+      
+      .video-embed {
+          aspect-ratio: 16/9;
+          width: 100%;
+          border-radius: 0.75rem;
+          overflow: hidden;
+      }
+      
+      @media (max-width: 1024px) {
+          .toc-sidebar {
+              transform: translateX(-100%);
+              transition: transform 0.3s ease;
+          }
+          
+          .toc-sidebar.open {
+              transform: translateX(0);
+          }
+          
+          .main-content {
+              margin-left: 0;
+          }
+
+          .mermaid-control-btn:not(.reset-zoom) {
+              display: none;
+          }
+          .mermaid-controls {
+              top: auto;
+              bottom: 15px;
+              right: 15px;
+          }
+      }
+
+      @media (max-width: 768px) {
+          body {
+              overflow-x: hidden;
+          }
+          
+          .hero-gradient h1 {
+              font-size: 2.5rem;
+          }
+          
+          .hero-gradient .grid > div {
+              padding: 1.5rem;
+          }
+          
+          .hero-gradient p {
+              font-size: 1rem;
+          }
+          
+          .hero-gradient .grid {
+              padding: 1rem;
+          }
+          
+          .hero-gradient img {
+              height: 12rem;
+          }
+          
+          .grid-cols-1 > div {
+              padding: 1.5rem;
+          }
+          
+          .grid-cols-1 > div img {
+              height: 10rem;
+          }
+      }
+      
+      .citation {
+          color: var(--primary);
+          text-decoration: none;
+          font-weight: 500;
+      }
+      
+      .citation:hover {
+          text-decoration: underline;
+      }
+      
+      .mermaid-container {
+          display: flex;
+          justify-content: center;
+          min-height: 300px;
+          max-height: 800px;
+          background: #ffffff;
+          border: 2px solid #e5e7eb;
+          border-radius: 12px;
+          padding: 30px;
+          margin: 30px 0;
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+          position: relative;
+          overflow: hidden;
+      }
+      
+      .mermaid-container .mermaid {
+          width: 100%;
+          max-width: 100%;
+          height: 100%;
+          cursor: grab;
+          transition: transform 0.3s ease;
+          transform-origin: center center;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          touch-action: none;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+      }
+      
+      .mermaid-container .mermaid svg {
+          max-width: 100%;
+          height: 100%;
+          display: block;
+          margin: 0 auto;
+      }
+      
+      .mermaid-container .mermaid:active {
+          cursor: grabbing;
+      }
+      
+      .mermaid-container.zoomed .mermaid {
+          height: 100%;
+          width: 100%;
+          cursor: grab;
+      }
+      
+      .mermaid-controls {
+          position: absolute;
+          top: 15px;
+          right: 15px;
+          display: flex;
+          gap: 10px;
+          z-index: 20;
+          background: rgba(255, 255, 255, 0.95);
+          padding: 8px;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      
+      .mermaid-control-btn {
+          background: #ffffff;
+          border: 1px solid #d1d5db;
+          border-radius: 6px;
+          padding: 10px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          color: #374151;
+          font-size: 14px;
+          min-width: 36px;
+          height: 36px;
+          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+      
+      .mermaid-control-btn:hover {
+          background: #f8fafc;
+          border-color: #3b82f6;
+          color: #3b82f6;
+          transform: translateY(-1px);
+      }
+      
+      .mermaid-control-btn:active {
+          transform: scale(0.95);
+      }
+      
+      /* Improve mermaid text contrast and styling */
+      .mermaid .node rect,
+      .mermaid .node circle,
+      .mermaid .node ellipse,
+      .mermaid .node polygon {
+          stroke-width: 2px !important;
+      }
+      
+      .mermaid .node .label {
+          color: #1f2937 !important;
+          font-weight: 600 !important;
+          font-size: 14px !important;
+          font-family: 'Inter', sans-serif !important;
+      }
+      
+      .mermaid .edgePath .path {
+          stroke: #64748b !important;
+          stroke-width: 2px !important;
+      }
+      
+      .mermaid .edgeLabel {
+          background-color: #ffffff !important;
+          color: #374151 !important;
+          font-weight: 500 !important;
+          font-family: 'Inter', sans-serif !important;
+          padding: 4px 8px !important;
+          border-radius: 4px !important;
+          border: 1px solid #e2e8f0 !important;
+      }
+      
+      /* Ensure good contrast for different node colors */
+      .mermaid .node[style*="fill:#e3f2fd"] .label,
+      .mermaid .node[style*="fill:#f3e5f5"] .label,
+      .mermaid .node[style*="fill:#e8f5e8"] .label {
+          color: #1f2937 !important;
+          font-weight: 600 !important;
+      }
+      
+      .mermaid .node[style*="fill:#fff3e0"] .label {
+          color: #1f2937 !important;
+          font-weight: 600 !important;
+      }
+      
+      .mermaid .node[style*="fill:#f0f9ff"] .label {
+          color: #1f2937 !important;
+          font-weight: 600 !important;
+      }
+  </style>
+</head>
+
+<body class="bg-slate-50">
+  <!-- Table of Contents Sidebar -->
+  <nav class="toc-sidebar">
+    <div class="mb-6">
+      <h3 class="text-lg font-bold text-slate-900 mb-4">Table of Contents</h3>
+      <a href="#introduction" class="toc-link">Introduction to MCP</a>
+      <a href="#usb-analogy" class="toc-link sub">The &#34;USB-C for AI&#34; Analogy</a>
+      <a href="#core-benefits" class="toc-link sub">Core Benefits</a>
+
+      <a href="#architecture" class="toc-link">MCP Architecture</a>
+      <a href="#host-client" class="toc-link sub">MCP Host/Client</a>
+      <a href="#server" class="toc-link sub">MCP Server</a>
+      <a href="#resources" class="toc-link sub">Resources &amp; Adapters</a>
+      <a href="#security" class="toc-link sub">Messaging &amp; Security</a>
+
+      <a href="#building" class="toc-link">Building MCP Servers</a>
+      <a href="#env-setup" class="toc-link sub">Environment Setup</a>
+      <a href="#defining-tools" class="toc-link sub">Defining MCP Tools</a>
+      <a href="#testing" class="toc-link sub">Testing &amp; Deployment</a>
+
+      <a href="#use-cases" class="toc-link">Use Cases &amp; Applications</a>
+      <a href="#integration" class="toc-link sub">Integration Complexity</a>
+      <a href="#automation" class="toc-link sub">MCP + n8n Automation</a>
+      <a href="#coding" class="toc-link sub">Coding &amp; Development</a>
+      <a href="#trading" class="toc-link sub">AI-Powered Trading</a>
+      <a href="#monetization" class="toc-link sub">Monetization</a>
+
+      <a href="#advanced" class="toc-link">Advanced Concepts</a>
+      <a href="#toolkits" class="toc-link sub">Toolkits &amp; SDKs</a>
+      <a href="#agents" class="toc-link sub">AI Agents</a>
+      <a href="#self-healing" class="toc-link sub">Self-Healing Networks</a>
+
+      <a href="#videos" class="toc-link">Video Resources</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Hero Section -->
+    <section class="hero-gradient min-h-screen flex items-center">
+      <div class="container mx-auto px-8 py-16">
+        <!-- Hero Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <!-- Left Column - Title and Overview -->
+          <div class="space-y-8">
+            <div class="space-y-6">
+              <h1 class="serif text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
+                <em class="text-sky-600">Model Context Protocol</em>
+                <br/>
+                The Universal Adapter for AI
+              </h1>
+              <p class="text-xl text-slate-600 leading-relaxed">
+                Standardize and simplify how AI models connect to external data sources, tools, and services.
+                Transform your LLM applications from conversational partners into capable assistants that can execute complex workflows.
+              </p>
+            </div>
+
+            <!-- Key Highlights Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+              <div class="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-slate-200">
+                <div class="flex items-center space-x-3">
+                  <i class="fas fa-plug text-sky-600 text-xl"></i>
+                  <span class="font-semibold text-slate-800">USB-C for AI</span>
+                </div>
+                <p class="text-sm text-slate-600 mt-1">Universal standard for AI connections</p>
+              </div>
+              <div class="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-slate-200">
+                <div class="flex items-center space-x-3">
+                  <i class="fas fa-cogs text-purple-600 text-xl"></i>
+                  <span class="font-semibold text-slate-800">N+M Integration</span>
+                </div>
+                <p class="text-sm text-slate-600 mt-1">Solve the N×M integration problem</p>
+              </div>
+              <div class="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-slate-200">
+                <div class="flex items-center space-x-3">
+                  <i class="fas fa-shield-alt text-cyan-600 text-xl"></i>
+                  <span class="font-semibold text-slate-800">Security First</span>
+                </div>
+                <p class="text-sm text-slate-600 mt-1">Built-in user consent and control</p>
+              </div>
+              <div class="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-slate-200">
+                <div class="flex items-center space-x-3">
+                  <i class="fas fa-rocket text-emerald-600 text-xl"></i>
+                  <span class="font-semibold text-slate-800">Rapid Prototyping</span>
+                </div>
+                <p class="text-sm text-slate-600 mt-1">Accelerate AI application development</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column - Visual Element -->
+          <div class="relative">
+            <div class="relative overflow-hidden rounded-2xl shadow-2xl">
+              <img src="https://kimi-web-img.moonshot.cn/img/miro.medium.com/627dc78285acea781d237ab797c0aa458d630eea.png" alt="AI system with connected nodes and modules" class="w-full h-96 object-cover" size="large" aspect="wide" query="AI system architecture" referrerpolicy="no-referrer" data-modified="1" data-score="11586.00"/>
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent"></div>
+              <div class="absolute bottom-6 left-6 text-white">
+                <p class="text-lg font-semibold">Connect AI to the Real World</p>
+                <p class="text-sm opacity-90">Standardized protocol for seamless integration</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Introduction Section -->
+    <section id="introduction" class="py-16 bg-white">
+      <div class="container mx-auto px-8">
+        <div class="max-w-4xl mx-auto">
+          <h2 class="serif text-4xl font-bold text-slate-900 mb-8">Introduction to Model Context Protocol</h2>
+
+          <div class="prose prose-lg max-w-none">
+            <p class="text-xl text-slate-600 leading-relaxed mb-8">
+              The <strong>Model Context Protocol (MCP)</strong> is an open standard designed to simplify and standardize how AI models,
+              particularly Large Language Models (LLMs), connect to external data sources, tools, and services. Think of it as a
+              universal adapter, like USB-C for AI, enabling seamless communication and interaction.
+            </p>
+
+            <!-- Mermaid Diagram: MCP Architecture Overview -->
+            <div class="my-12 bg-slate-50 p-8 rounded-xl">
+              <h3 class="text-2xl font-bold text-slate-900 mb-6 text-center">MCP Architecture Overview</h3>
+              <div class="mermaid-container">
+                <div class="mermaid-controls">
+                  <button class="mermaid-control-btn zoom-in" title="放大">
+                    <i class="fas fa-search-plus"></i>
+                  </button>
+                  <button class="mermaid-control-btn zoom-out" title="缩小">
+                    <i class="fas fa-search-minus"></i>
+                  </button>
+                  <button class="mermaid-control-btn reset-zoom" title="重置">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                  </button>
+                  <button class="mermaid-control-btn fullscreen" title="全屏查看">
+                    <i class="fas fa-expand"></i>
+                  </button>
+                </div>
+                <div class="mermaid" id="mermaid-diagram-1">
+                  graph TD
+                  A[&#34;LLM Application&#34;] --&gt; B[&#34;MCP Client&#34;]
+                  B --&gt; C[&#34;MCP Server 1
+                  <br/>Database Tools&#34;]
+                  B --&gt; D[&#34;MCP Server 2
+                  <br/>File System&#34;]
+                  B --&gt; E[&#34;MCP Server 3
+                  <br/>External APIs&#34;]
+                  C --&gt; F[&#34;PostgreSQL Database&#34;]
+                  D --&gt; G[&#34;Local Filesystem&#34;]
+                  E --&gt; H[&#34;Weather API&#34;]
+                  E --&gt; I[&#34;Email Service&#34;]
+
+                  style A fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#1f2937
+                  style B fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px,color:#1f2937
+                  style C fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#1f2937
+                  style D fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#1f2937
+                  style E fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#1f2937
+                  style F fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#1f2937
+                  style G fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#1f2937
+                  style H fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#1f2937
+                  style I fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#1f2937
+                </div>
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-12">
+              <div>
+                <h3 class="text-2xl font-bold text-slate-900 mb-4">What is MCP?</h3>
+                <p class="text-slate-600 mb-4">
+                  MCP is an <a href="https://github.com/modelcontextprotocol" class="citation">open protocol</a>
+                  meticulously designed to standardize and facilitate seamless integration between Large Language Model (LLM)
+                  applications and external data sources, tools, and services. Introduced by Anthropic, MCP acts as a universal
+                  language, enabling AI agents to interact securely and efficiently with a wide array of external systems.
+                </p>
+                <p class="text-slate-600">
+                  This standardization is crucial for building robust, secure, and highly modular AI architectures,
+                  allowing AI models to interface with dynamic, real-world data effectively.
+                </p>
+              </div>
+              <div>
+                <h3 class="text-2xl font-bold text-slate-900 mb-4">Key Components</h3>
+                <ul class="space-y-3 text-slate-600">
+                  <li class="flex items-start space-x-3">
+                    <i class="fas fa-server text-sky-600 mt-1"></i>
+                    <span><strong>MCP Servers:</strong> Lightweight programs that expose specific capabilities</span>
+                  </li>
+                  <li class="flex items-start space-x-3">
+                    <i class="fas fa-desktop text-sky-600 mt-1"></i>
+                    <span><strong>MCP Clients:</strong> Embedded within LLM applications to connect to servers</span>
+                  </li>
+                  <li class="flex items-start space-x-3">
+                    <i class="fas fa-tools text-sky-600 mt-1"></i>
+                    <span><strong>Tools &amp; Resources:</strong> Functions and data exposed by servers</span>
+                  </li>
+                  <li class="flex items-start space-x-3">
+                    <i class="fas fa-comment-alt text-sky-600 mt-1"></i>
+                    <span><strong>Prompts:</strong> Pre-written templates for task guidance</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div id="usb-analogy" class="mb-12">
+              <h3 class="text-2xl font-bold text-slate-900 mb-6">The &#34;USB-C for AI&#34; Analogy</h3>
+
+              <div class="bg-gradient-to-r from-sky-50 to-purple-50 p-8 rounded-xl border border-sky-200 mb-8">
+                <div class="flex items-start space-x-4">
+                  <i class="fas fa-lightbulb text-sky-600 text-2xl mt-1"></i>
+                  <div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-3">Universal Standardization</h4>
+                    <p class="text-slate-700 mb-4">
+                      Just as USB-C provides a standardized, universal way to connect devices to peripherals,
+                      MCP offers a standardized connection for Large Language Models to tap into diverse data sources and external tools.
+                    </p>
+                    <p class="text-slate-700">
+                      Before MCP, integrating LLMs required custom solutions for each tool or data source. MCP simplifies this
+                      by providing a common interface, allowing any MCP-compliant client to connect to any MCP-compliant server.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid md:grid-cols-3 gap-6">
+                <div class="benefit-card">
+                  <i class="fas fa-exchange-alt text-sky-600 text-2xl mb-4"></i>
+                  <h4 class="font-bold text-slate-900 mb-2">Interoperability</h4>
+                  <p class="text-slate-600 text-sm">Any MCP client can connect to any MCP server, regardless of the specific tool or data source</p>
+                </div>
+                <div class="benefit-card">
+                  <i class="fas fa-search text-sky-600 text-2xl mb-4"></i>
+                  <h4 class="font-bold text-slate-900 mb-2">Discoverability</h4>
+                  <p class="text-slate-600 text-sm">MCP clients can query servers to understand available tools and how to use them</p>
+                </div>
+                <div class="benefit-card">
+                  <i class="fas fa-plug text-sky-600 text-2xl mb-4"></i>
+                  <h4 class="font-bold text-slate-900 mb-2">Plug-and-Play</h4>
+                  <p class="text-slate-600 text-sm">Developers can rely on standardized protocol instead of custom integration code</p>
+                </div>
+              </div>
+            </div>
+
+            <div id="core-benefits" class="mb-12">
+              <h3 class="text-2xl font-bold text-slate-900 mb-6">Core Benefits of MCP</h3>
+
+              <div class="space-y-8">
+                <div class="highlight-box">
+                  <h4 class="text-xl font-bold text-slate-900 mb-3">
+                    <i class="fas fa-cogs text-sky-600 mr-2"></i>
+                    Standardization
+                  </h4>
+                  <p class="text-slate-700 mb-4">
+                    MCP provides a unified interface for AI models to interact with external tools, data sources, and services.
+                    This eliminates the &#34;N x M&#34; integration problem where every LLM would need a custom connector for every external tool.
+                  </p>
+                  <p class="text-slate-700">
+                    By standardizing the communication protocol, MCP allows developers to build MCP servers that expose specific
+                    functionalities, and any MCP-compliant client can then connect to and utilize these functionalities.
+                  </p>
+                </div>
+
+                <div class="highlight-box">
+                  <h4 class="text-xl font-bold text-slate-900 mb-3">
+                    <i class="fas fa-rocket text-sky-600 mr-2"></i>
+                    Enhanced LLM Capabilities
+                  </h4>
+                  <p class="text-slate-700 mb-4">
+                    MCP bridges the gap between LLMs&#39; linguistic prowess and the ability to perform tangible tasks in the real world.
+                    By connecting LLMs to tools that can query databases, send emails, manipulate files, or interact with APIs,
+                    MCP empowers them to become more than just conversational partners.
+                  </p>
+                  <p class="text-slate-700">
+                    This allows for the creation of AI agents that can execute complex workflows, perform personalized outreach,
+                    and assist in financial analysis by incorporating dynamic data sources.
+                  </p>
+                </div>
+
+                <div class="highlight-box">
+                  <h4 class="text-xl font-bold text-slate-900 mb-3">
+                    <i class="fas fa-shield-alt text-sky-600 mr-2"></i>
+                    Improved Security and User Control
+                  </h4>
+                  <p class="text-slate-700 mb-4">
+                    MCP is designed with considerations for data privacy and tool safety. MCP servers can enforce authentication
+                    and authorization, ensuring that LLMs only access data and tools for which they have permission.
+                  </p>
+                  <p class="text-slate-700">
+                    Users often have to approve tool usage, providing a layer of control over what actions an AI agent can perform.
+                    This is particularly important when dealing with sensitive information in healthcare or business domains.
+                  </p>
+                </div>
+
+                <div class="highlight-box">
+                  <h4 class="text-xl font-bold text-slate-900 mb-3">
+                    <i class="fas fa-tachometer-alt text-sky-600 mr-2"></i>
+                    Rapid Prototyping and Ecosystem Growth
+                  </h4>
+                  <p class="text-slate-700 mb-4">
+                    MCP simplifies integration, accelerating the development cycle for AI applications. Developers can quickly
+                    connect LLMs to various data sources and tools to test new use cases and gather feedback.
+                  </p>
+                  <p class="text-slate-700">
+                    The availability of SDKs in multiple languages (Python, TypeScript, Java, etc.) and a growing list of
+                    pre-built MCP servers for common services further speeds up development and fosters collaboration.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="py-16 bg-slate-50">
+      <div class="container mx-auto px-8">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="serif text-4xl font-bold text-slate-900 mb-12 text-center">Understanding MCP Architecture and Components</h2>
+
+          <p class="text-xl text-slate-600 text-center mb-12 max-w-4xl mx-auto">
+            The Model Context Protocol architecture is designed around a client-server model, enabling AI applications (clients)
+            to interact with external tools and data sources (servers) in a standardized way.
+          </p>
+
+          <!-- Architecture Overview Table -->
+          <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-12">
+            <div class="bg-gradient-to-r from-sky-600 to-purple-600 p-6">
+              <h3 class="text-2xl font-bold text-white">MCP Architecture Components</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-slate-50">
+                  <tr>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Component</th>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Role</th>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Key Responsibilities</th>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Examples</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <i class="fas fa-desktop text-sky-600"></i>
+                        <span class="font-semibold text-slate-900">MCP Host/Client</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">The application where users interact with an LLM and initiate MCP requests</td>
+                    <td class="px-6 py-4 text-slate-700">Manages user interaction, discovers MCP servers, formats requests, handles responses, enforces security</td>
+                    <td class="px-6 py-4 text-slate-700">AI-powered IDEs (Cursor), chat interfaces (Claude Desktop), custom AI apps</td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <i class="fas fa-server text-sky-600"></i>
+                        <span class="font-semibold text-slate-900">MCP Server</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">Lightweight program that exposes specific capabilities via MCP</td>
+                    <td class="px-6 py-4 text-slate-700">Listens for MCP requests, translates to actions, formats responses, declares capabilities</td>
+                    <td class="px-6 py-4 text-slate-700">Database MCP server, File System MCP server, Calendar MCP server</td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <i class="fas fa-file-alt text-sky-600"></i>
+                        <span class="font-semibold text-slate-900">Resources</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">File-like data exposed by an MCP Server that can be read by clients</td>
+                    <td class="px-6 py-4 text-slate-700">Provides contextual information to LLMs, uniquely identified by URIs</td>
+                    <td class="px-6 py-4 text-slate-700">Internal documentation, code files, database query results</td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <i class="fas fa-tools text-sky-600"></i>
+                        <span class="font-semibold text-slate-900">Tools</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">Executable functions exposed by an MCP Server that an LLM can call</td>
+                    <td class="px-6 py-4 text-slate-700">Performs actions or retrieves information, defined with clear parameters</td>
+                    <td class="px-6 py-4 text-slate-700">
+                      <code>query_database</code>,
+                      <code>send_email</code>,
+                      <code>get_weather_forecast</code>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <i class="fas fa-comment-alt text-sky-600"></i>
+                        <span class="font-semibold text-slate-900">Prompts</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">Pre-written templates exposed by an MCP Server to guide users</td>
+                    <td class="px-6 py-4 text-slate-700">Helps users accomplish tasks by providing structured guidance</td>
+                    <td class="px-6 py-4 text-slate-700">Templates for common queries, command structures for tools</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="grid lg:grid-cols-2 gap-12">
+            <div id="host-client">
+              <h3 class="text-2xl font-bold text-slate-900 mb-6">MCP Host/Client</h3>
+              <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <p class="text-slate-700 mb-4">
+                  The MCP Host is the application or environment where the user interacts with a Large Language Model.
+                  Examples include AI-powered IDEs like Cursor, chat interfaces such as Claude Desktop, or custom AI workflow applications.
+                </p>
+                <p class="text-slate-700 mb-4">
+                  Within the host application, the MCP Client component facilitates communication between the LLM and MCP Servers.
+                  It discovers available MCP servers, translates requests into MCP-compliant calls, and handles responses.
+                </p>
+                <div class="bg-sky-50 p-4 rounded-lg border-l-4 border-sky-500">
+                  <p class="text-slate-700 font-medium">
+                    <i class="fas fa-info-circle text-sky-600 mr-2"></i>
+                    The MCP client acts as the &#34;AI brain&#39;s&#34; interface to the external world, enabling seamless leverage of external capabilities.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div id="server">
+              <h3 class="text-2xl font-bold text-slate-900 mb-6">MCP Server</h3>
+              <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <p class="text-slate-700 mb-4">
+                  The MCP Server is a critical component that acts as a bridge between LLMs and external data sources, tools, or services.
+                  It is a lightweight program that exposes specific capabilities through the standardized MCP protocol.
+                </p>
+                <p class="text-slate-700 mb-4">
+                  Servers can be developed in any programming language that can print to stdout or serve an HTTP endpoint,
+                  with Python, JavaScript, and Go being common choices.
+                </p>
+                <div class="grid grid-cols-3 gap-4 mt-4">
+                  <div class="text-center p-3 bg-sky-50 rounded-lg">
+                    <i class="fas fa-file-alt text-sky-600 text-xl mb-2"></i>
+                    <div class="text-sm font-medium text-slate-900">Resources</div>
+                    <div class="text-xs text-slate-600">File-like data</div>
+                  </div>
+                  <div class="text-center p-3 bg-purple-50 rounded-lg">
+                    <i class="fas fa-tools text-purple-600 text-xl mb-2"></i>
+                    <div class="text-sm font-medium text-slate-900">Tools</div>
+                    <div class="text-xs text-slate-600">Callable functions</div>
+                  </div>
+                  <div class="text-center p-3 bg-cyan-50 rounded-lg">
+                    <i class="fas fa-comment-alt text-cyan-600 text-xl mb-2"></i>
+                    <div class="text-sm font-medium text-slate-900">Prompts</div>
+                    <div class="text-xs text-slate-600">Task templates</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-12">
+            <div id="resources" class="mb-8">
+              <h3 class="text-2xl font-bold text-slate-900 mb-6">Resources and Adapters</h3>
+              <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <p class="text-slate-700 mb-4">
+                  Resources are file-like data that can be read by clients, encompassing API responses, file contents,
+                  database query results, or dynamically generated content. They provide contextual information to LLMs.
+                </p>
+                <p class="text-slate-700 mb-4">
+                  Adapters refer to the logic within an MCP server that translates between the MCP protocol and specific external systems.
+                  The MCP server itself acts as an adapter, bridging the LLM&#39;s world with external tools and data.
+                </p>
+                <div class="bg-gradient-to-r from-sky-50 to-purple-50 p-4 rounded-lg">
+                  <p class="text-slate-700">
+                    <strong>Example:</strong> A PostgreSQL MCP server adapts MCP requests into SQL queries,
+                    executes them against the database, and formats the results into MCP-compliant responses.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div id="security">
+              <h3 class="text-2xl font-bold text-slate-900 mb-6">Messaging and Security</h3>
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                  <h4 class="text-lg font-bold text-slate-900 mb-4">
+                    <i class="fas fa-envelope text-sky-600 mr-2"></i>
+                    JSON-RPC 2.0 Messaging
+                  </h4>
+                  <p class="text-slate-700 mb-3">
+                    MCP utilizes JSON-RPC 2.0 for messaging between clients and servers, providing a lightweight,
+                    language-agnostic, and standardized way to structure communication.
+                  </p>
+                  <ul class="space-y-2 text-slate-700 text-sm">
+                    <li><i class="fas fa-arrow-right text-sky-600 mr-2"></i><strong>Requests:</strong> Bidirectional messages expecting responses</li>
+                    <li><i class="fas fa-arrow-left text-sky-600 mr-2"></i><strong>Responses:</strong> Results or errors corresponding to requests</li>
+                    <li><i class="fas fa-bell text-sky-600 mr-2"></i><strong>Notifications:</strong> One-way messages requiring no response</li>
+                  </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                  <h4 class="text-lg font-bold text-slate-900 mb-4">
+                    <i class="fas fa-shield-alt text-sky-600 mr-2"></i>
+                    Security &amp; Trust
+                  </h4>
+                  <ul class="space-y-3 text-slate-700 text-sm">
+                    <li><i class="fas fa-user-check text-sky-600 mr-2"></i><strong>User Consent:</strong> Explicit approval for data access and operations</li>
+                    <li><i class="fas fa-lock text-sky-600 mr-2"></i><strong>Data Privacy:</strong> Protection of user data with access controls</li>
+                    <li><i class="fas fa-toolbox text-sky-600 mr-2"></i><strong>Tool Safety:</strong> Approval required for arbitrary code execution</li>
+                    <li><i class="fas fa-eye-slash text-sky-600 mr-2"></i><strong>LLM Controls:</strong> Limited server visibility into prompts</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Building MCP Servers Section -->
+    <section id="building" class="py-16 bg-white">
+      <div class="container mx-auto px-8">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="serif text-4xl font-bold text-slate-900 mb-12 text-center">Building Your Own MCP Server</h2>
+
+          <p class="text-xl text-slate-600 text-center mb-12 max-w-4xl mx-auto">
+            This step-by-step guide will walk you through setting up a development environment, defining tools,
+            and running your first MCP server with Python and TypeScript examples.
+          </p>
+
+          <!-- Steps Overview Table -->
+          <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-12">
+            <div class="bg-gradient-to-r from-emerald-600 to-cyan-600 p-6">
+              <h3 class="text-2xl font-bold text-white">MCP Server Development Process</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-slate-50">
+                  <tr>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Step</th>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Description</th>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Key Actions</th>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Example (Python)</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-sky-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                        <span class="font-semibold text-slate-900">Environment Setup</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">Prepare development environment with necessary software</td>
+                    <td class="px-6 py-4 text-slate-700">Install Python 3.10+, uv, MCP SDK, create virtual environment</td>
+                    <td class="px-6 py-4 text-slate-700 font-mono text-sm">
+                      <code>uv venv</code>,
+                      <code>uv add &#34;mcp[cli]&#34;</code>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-sky-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                        <span class="font-semibold text-slate-900">Define MCP Tools</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">Create functions that your MCP server will expose as tools</td>
+                    <td class="px-6 py-4 text-slate-700">Use SDK decorators, define parameters, return types, docstrings</td>
+                    <td class="px-6 py-4 text-slate-700 font-mono text-sm">
+                      <code>@mcp.tool()</code>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-sky-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                        <span class="font-semibold text-slate-900">Server Initialization</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">Create MCP server instance and register tools</td>
+                    <td class="px-6 py-4 text-slate-700">Import SDK server class, add tools to server instance</td>
+                    <td class="px-6 py-4 text-slate-700 font-mono text-sm">
+                      <code>mcp = FastMCP()</code>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-sky-600 text-white rounded-full flex items-center justify-center text-sm font-bold">4</div>
+                        <span class="font-semibold text-slate-900">Start Server</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">Run MCP server to listen for incoming requests</td>
+                    <td class="px-6 py-4 text-slate-700">Use SDK method to start server, specify transport method</td>
+                    <td class="px-6 py-4 text-slate-700 font-mono text-sm">
+                      <code>uv run main.py</code>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-sky-600 text-white rounded-full flex items-center justify-center text-sm font-bold">5</div>
+                        <span class="font-semibold text-slate-900">Configure Client</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">Set up MCP client application to connect to server</td>
+                    <td class="px-6 py-4 text-slate-700">Edit client config file, provide server command/URL</td>
+                    <td class="px-6 py-4 text-slate-700 font-mono text-sm">Pointing Claude Desktop to server</td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-sky-600 text-white rounded-full flex items-center justify-center text-sm font-bold">6</div>
+                        <span class="font-semibold text-slate-900">Test Tools</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">Interact with MCP client to trigger server tools</td>
+                    <td class="px-6 py-4 text-slate-700">Use natural language prompts, check server logs and output</td>
+                    <td class="px-6 py-4 text-slate-700 font-mono text-sm">Asking Claude to use tools</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="env-setup" class="mb-12">
+            <h3 class="text-2xl font-bold text-slate-900 mb-6">Setting Up Your Development Environment</h3>
+            <div class="bg-slate-50 p-8 rounded-xl">
+              <p class="text-slate-700 mb-6">
+                The primary requirement is <strong>Python 3.10 or higher</strong>. We recommend using
+                <code>uv</code>, a fast Python package installer and resolver developed by Astral.
+              </p>
+
+              <div class="space-y-6">
+                <div>
+                  <h4 class="text-lg font-bold text-slate-900 mb-3">Install uv</h4>
+                  <div class="code-block">
+                    curl -LsSf https://astral.sh/uv/install.sh | sh
+                  </div>
+                  <p class="text-slate-600 text-sm mt-2">Restart your terminal after installation</p>
+                </div>
+
+                <div>
+                  <h4 class="text-lg font-bold text-slate-900 mb-3">Create Project and Virtual Environment</h4>
+                  <div class="code-block">
+                    uv init my-mcp-server
+                    cd my-mcp-server
+                    uv venv
+                    source .venv/bin/activate # On Windows: .venv\Scripts\activate
+                  </div>
+                </div>
+
+                <div>
+                  <h4 class="text-lg font-bold text-slate-900 mb-3">Install Dependencies</h4>
+                  <div class="code-block">
+                    uv add &#34;mcp[cli]&#34; pandas pyarrow httpx
+                  </div>
+                  <p class="text-slate-600 text-sm mt-2">This installs the MCP SDK with CLI tools and common libraries</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="defining-tools" class="mb-12">
+            <h3 class="text-2xl font-bold text-slate-900 mb-6">Defining MCP Tools (Python &amp; TypeScript)</h3>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+              <div>
+                <h4 class="text-lg font-bold text-slate-900 mb-4">
+                  <i class="fab fa-python text-sky-600 mr-2"></i>
+                  Python Example
+                </h4>
+                <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                  <p class="text-slate-700 mb-4">Create a Python file
+                    <code>weather_server.py</code>:
+                  </p>
+                  <div class="code-block">
+                    from typing import Any
+                    import httpx
+                    from mcp.server.fastmcp import FastMCP
+
+                    # Initialize MCP server
+                    mcp = FastMCP(&#34;WeatherAndCalcServer&#34;)
+
+                    # Simple calculator tool
+                    @mcp.tool()
+                    def add_numbers(a: int, b: int) -&gt; int:
+                    &#34;&#34;&#34;Adds two integers and returns the result.&#34;&#34;&#34;
+                    return a + b
+
+                    # Weather forecast tool
+                    @mcp.tool()
+                    async def get_weather_forecast(latitude: float, longitude: float) -&gt; str:
+                    &#34;&#34;&#34;Fetches weather forecast for given coordinates.&#34;&#34;&#34;
+                    # API implementation here
+                    return f&#34;Weather at {latitude},{longitude}&#34;
+
+                    if __name__ == &#34;__main__&#34;:
+                    # Start server with stdio transport
+                    mcp.run(transport=&#34;stdio&#34;)
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 class="text-lg font-bold text-slate-900 mb-4">
+                  <i class="fab fa-js-square text-yellow-600 mr-2"></i>
+                  TypeScript Example
+                </h4>
+                <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                  <p class="text-slate-700 mb-4">Create
+                    <code>calculatorServer.ts</code>:
+                  </p>
+                  <div class="code-block">
+                    import { McpServer, Tool } from &#39;@modelcontext/mcp-sdk&#39;;
+
+                    const server = new McpServer(&#39;TypeScriptCalculatorServer&#39;);
+
+                    @Tool({
+                    name: &#39;multiplyNumbers&#39;,
+                    description: &#39;Multiplies two numbers.&#39;,
+                    })
+                    function multiply(x: number, y: number): number {
+                    return x * y;
+                    }
+
+                    server.registerTool(multiply);
+
+                    server.start({
+                    transport: &#39;stdio&#39;,
+                    }).then(() =&gt; {
+                    console.log(&#39;MCP Server running...&#39;);
+                    });
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 bg-amber-50 border border-amber-200 rounded-xl p-6">
+              <h4 class="text-lg font-bold text-amber-900 mb-3">
+                <i class="fas fa-lightbulb text-amber-600 mr-2"></i>
+                Key Points
+              </h4>
+              <ul class="space-y-2 text-amber-800">
+                <li><i class="fas fa-check-circle text-amber-600 mr-2"></i>Use
+                  <code>@mcp.tool()</code> decorator in Python or
+                  <code>@Tool</code> decorator in TypeScript
+                </li>
+                <li><i class="fas fa-check-circle text-amber-600 mr-2"></i>Type hints and docstrings are used for tool descriptions</li>
+                <li><i class="fas fa-check-circle text-amber-600 mr-2"></i>Async functions are supported for I/O operations</li>
+                <li><i class="fas fa-check-circle text-amber-600 mr-2"></i>Choose transport:
+                  <code>stdio</code> for local,
+                  <code>http</code> for remote
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div id="testing">
+            <h3 class="text-2xl font-bold text-slate-900 mb-6">Starting and Testing Your MCP Server</h3>
+
+            <div class="space-y-8">
+              <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h4 class="text-lg font-bold text-slate-900 mb-4">
+                  <i class="fas fa-play text-green-600 mr-2"></i>
+                  Starting the Server
+                </h4>
+                <div class="code-block mb-4">
+                  # For Python server
+                  uv run main.py
+
+                  # Or with plain Python
+                  python main.py
+                </div>
+                <p class="text-slate-700">The server will start and wait for connections. For stdio transport, it reads from standard input and writes to standard output.</p>
+              </div>
+
+              <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h4 class="text-lg font-bold text-slate-900 mb-4">
+                  <i class="fas fa-cog text-blue-600 mr-2"></i>
+                  Configuring MCP Clients
+                </h4>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h5 class="font-semibold text-slate-900 mb-3">Claude Desktop</h5>
+                    <p class="text-slate-700 text-sm mb-3">Edit configuration file:</p>
+                    <div class="code-block text-xs">
+                      // ~/Library/Application Support/Claude/claude_desktop_config.json
+                      {
+                      &#34;mcpServers&#34;: {
+                      &#34;mix_server&#34;: {
+                      &#34;command&#34;: &#34;uv&#34;,
+                      &#34;args&#34;: [
+                      &#34;--directory&#34;,
+                      &#34;/PATH/TO/PROJECT&#34;,
+                      &#34;run&#34;,
+                      &#34;main.py&#34;
+                      ]
+                      }
+                      }
+                      }
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="font-semibold text-slate-900 mb-3">Cursor IDE</h5>
+                    <p class="text-slate-700 text-sm mb-3">Edit MCP configuration:</p>
+                    <div class="code-block text-xs">
+                      // ~/.cursor/mcp.json
+                      {
+                      &#34;mcpServers&#34;: {
+                      &#34;my_python_server&#34;: {
+                      &#34;command&#34;: &#34;python&#34;,
+                      &#34;args&#34;: [&#34;/PATH/TO/server.py&#34;]
+                      }
+                      }
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h4 class="text-lg font-bold text-slate-900 mb-4">
+                  <i class="fas fa-vial text-purple-600 mr-2"></i>
+                  Testing Your Tools
+                </h4>
+                <ol class="space-y-3 text-slate-700">
+                  <li class="flex items-start space-x-3">
+                    <span class="bg-sky-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mt-0.5">1</span>
+                    <span>In your MCP client (Claude Desktop, Cursor), ask a question that would trigger your tool</span>
+                  </li>
+                  <li class="flex items-start space-x-3">
+                    <span class="bg-sky-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mt-0.5">2</span>
+                    <span>The LLM should recognize the intent and available tool</span>
+                  </li>
+                  <li class="flex items-start space-x-3">
+                    <span class="bg-sky-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mt-0.5">3</span>
+                    <span>Approve the tool execution request (if prompted)</span>
+                  </li>
+                  <li class="flex items-start space-x-3">
+                    <span class="bg-sky-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mt-0.5">4</span>
+                    <span>Your MCP server will execute the tool and return results</span>
+                  </li>
+                </ol>
+
+                <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p class="text-green-800">
+                    <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                    <strong>Example:</strong> Ask Claude: &#34;What is 5 plus 7 using the add_numbers tool?&#34;
+                    or &#34;What&#39;s the weather at [coordinates] using get_weather_forecast?&#34;
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8">
+              <!-- Video Tutorial -->
+              <h4 class="text-lg font-bold text-slate-900 mb-4">
+                <i class="fas fa-video text-red-600 mr-2"></i>
+                Video Tutorial Companion
+              </h4>
+              <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <p class="text-slate-700 mb-4">
+                  Watch <strong>&#34;Learn MCP Servers with Python (EASY)&#34;</strong> by Alejandro AO for a visual step-by-step guide:
+                </p>
+                <div class="video-embed">
+                  <iframe src="https://www.youtube.com/embed/Ek8JHgZtmcI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="" class="w-full h-full"></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Use Cases Section -->
+    <section id="use-cases" class="py-16 bg-slate-50">
+      <div class="container mx-auto px-8">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="serif text-4xl font-bold text-slate-900 mb-12 text-center">MCP Use Cases and Problem Statements</h2>
+
+          <p class="text-xl text-slate-600 text-center mb-12 max-w-4xl mx-auto">
+            MCP transforms how we interact with AI and automate tasks across various domains,
+            from solving complex integration challenges to enabling sophisticated AI agents.
+          </p>
+
+          <!-- Use Cases Overview Table -->
+          <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-12">
+            <div class="bg-gradient-to-r from-emerald-600 to-cyan-600 p-6">
+              <h3 class="text-2xl font-bold text-white">MCP Use Cases Overview</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-slate-50">
+                  <tr>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Use Case Category</th>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Problem Statement</th>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">How MCP Helps</th>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Example Applications</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <i class="fas fa-project-diagram text-emerald-600"></i>
+                        <span class="font-semibold text-slate-900">Integration Complexity</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">N LLMs needing custom integrations for M tools/data sources</td>
+                    <td class="px-6 py-4 text-slate-700">Standardizes interface, reducing N×M to N+M connections</td>
+                    <td class="px-6 py-4 text-slate-700">Simplifying AI app development with multiple external services</td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <i class="fas fa-cogs text-blue-600"></i>
+                        <span class="font-semibold text-slate-900">Workflow Automation</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">Complex, multi-step tasks require custom scripting</td>
+                    <td class="px-6 py-4 text-slate-700">n8n acts as MCP Server/Client, enabling AI-driven automation</td>
+                    <td class="px-6 py-4 text-slate-700">AI-powered ticket triage, automated research summarization</td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <i class="fas fa-code text-purple-600"></i>
+                        <span class="font-semibold text-slate-900">Coding &amp; Development</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">AI coding assistants lack deep context of private codebases</td>
+                    <td class="px-6 py-4 text-slate-700">Connects AI assistants to codebases, documentation, databases</td>
+                    <td class="px-6 py-4 text-slate-700">Enhanced code completion, automated refactoring, test generation</td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <i class="fas fa-globe text-cyan-600"></i>
+                        <span class="font-semibold text-slate-900">Web Applications</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">Web apps lack dynamic, personalized AI-driven features</td>
+                    <td class="px-6 py-4 text-slate-700">Web app backends act as MCP clients for AI-driven features</td>
+                    <td class="px-6 py-4 text-slate-700">Intelligent chatbots, dynamic content generation</td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <i class="fas fa-chart-line text-indigo-600"></i>
+                        <span class="font-semibold text-slate-900">AI-Powered Trading</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">Trading algorithms need real-time data with fragmented systems</td>
+                    <td class="px-6 py-4 text-slate-700">Connects AI trading agents to market data, news, execution systems</td>
+                    <td class="px-6 py-4 text-slate-700">Real-time market analysis, automated trade execution</td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center space-x-3">
+                        <i class="fas fa-dollar-sign text-green-600"></i>
+                        <span class="font-semibold text-slate-900">Monetization</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-700">Difficulty creating specialized AI tools at scale</td>
+                    <td class="px-6 py-4 text-slate-700">Developers can build and sell specialized MCP Servers</td>
+                    <td class="px-6 py-4 text-slate-700">Subscription-based tools, AI-powered SaaS products</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="grid lg:grid-cols-2 gap-12">
+            <div id="integration">
+              <h3 class="text-2xl font-bold text-slate-900 mb-6">Solving the &#34;N x M&#34; Integration Problem</h3>
+              <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                <div class="mb-6">
+                  <img src="https://kimi-web-img.moonshot.cn/img/forummagazine.org/c39bc0e5f8c1c2beeb39a9f0b6deedccb7bc42ed.jpg" alt="Software integration complexity" class="w-full h-48 object-cover rounded-lg" size="medium" aspect="wide" query="software integration complexity" referrerpolicy="no-referrer" data-modified="1" data-score="11587.00"/>
+                </div>
+                <p class="text-slate-700 mb-4">
+                  The &#34;N times M&#34; integration problem occurs when N different client applications need to interact with M different
+                  server-side tools or data sources. Without standardization, each client needs custom integration for each server.
+                </p>
+                <p class="text-slate-700 mb-6">
+                  MCP solves this by introducing a standardized protocol, reducing complexity from N×M integrations to N+M implementations.
+                  Any MCP-compatible client can connect to any MCP-compatible server.
+                </p>
+
+                <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg">
+                  <h4 class="text-lg font-bold text-slate-900 mb-3">Example</h4>
+                  <p class="text-slate-700">
+                    If a developer creates a new LLM application (new &#34;N&#34;), it can immediately leverage all existing MCP servers (&#34;M&#34;)
+                    without custom integrations. Similarly, a new MCP server becomes available to all existing MCP clients.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div id="automation">
+              <h3 class="text-2xl font-bold text-slate-900 mb-6">Automating Tasks with MCP and n8n</h3>
+              <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                <p class="text-slate-700 mb-4">
+                  n8n can act as both an <strong>MCP Server</strong> (exposing workflows as callable MCP tools) and an
+                  <strong>MCP Client</strong> (connecting to external MCP Servers within workflows).
+                </p>
+
+                <div class="space-y-4 mb-6">
+                  <div class="flex items-start space-x-3">
+                    <i class="fas fa-server text-sky-600 mt-1"></i>
+                    <div>
+                      <h4 class="font-semibold text-slate-900">n8n as MCP Server</h4>
+                      <p class="text-slate-700 text-sm">Expose workflows as MCP tools using the &#34;MCP Server Trigger&#34; node</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start space-x-3">
+                    <i class="fas fa-plug text-sky-600 mt-1"></i>
+                    <div>
+                      <h4 class="font-semibold text-slate-900">n8n as MCP Client</h4>
+                      <p class="text-slate-700 text-sm">Use &#34;MCP Client Tool&#34; node to connect to external MCP Servers</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 class="text-lg font-bold text-green-900 mb-3">Use Case Examples</h4>
+                  <ul class="space-y-2 text-green-800">
+                    <li><i class="fas fa-ticket-alt text-green-600 mr-2"></i>AI-powered ticket triage (Slack → Linear)</li>
+                    <li><i class="fas fa-search text-green-600 mr-2"></i>Automated research summarization</li>
+                    <li><i class="fas fa-heartbeat text-green-600 mr-2"></i>Self-healing DevOps scripts</li>
+                    <li><i class="fas fa-tasks text-green-600 mr-2"></i>Personal to-do bots (Notion/Airtable)</li>
+                  </ul>
+                </div>
+
+                <div class="mt-6">
+                  <p class="text-slate-600 text-sm">
+                    Watch: <a href="https://youtu.be/4FEg4XU6yQ4?si=BxmNyUPqcwnjGGNw" class="citation">MCP Demo using Python, AI and a self healing network</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-12 grid lg:grid-cols-2 gap-12">
+            <div id="coding">
+              <h3 class="text-2xl font-bold text-slate-900 mb-6">Accelerating Coding and Development</h3>
+              <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                <p class="text-slate-700 mb-4">
+                  MCP enables AI-powered coding assistants to interact more deeply with development environments and tools,
+                  going beyond generic code suggestions to provide project-specific assistance.
+                </p>
+
+                <div class="space-y-4 mb-6">
+                  <div class="benefit-card">
+                    <i class="fas fa-code text-sky-600 text-xl mb-3"></i>
+                    <h4 class="font-bold text-slate-900 mb-2">Enhanced Context</h4>
+                    <p class="text-slate-600 text-sm">Access to project files, codebase structure, and documentation</p>
+                  </div>
+                  <div class="benefit-card">
+                    <i class="fas fa-magic text-sky-600 text-xl mb-3"></i>
+                    <h4 class="font-bold text-slate-900 mb-2">Smart Refactoring</h4>
+                    <p class="text-slate-600 text-sm">Automated refactoring with understanding of code dependencies</p>
+                  </div>
+                  <div class="benefit-card">
+                    <i class="fas fa-play text-sky-600 text-xl mb-3"></i>
+                    <h4 class="font-bold text-slate-900 mb-2">Test Generation</h4>
+                    <p class="text-slate-600 text-sm">Generate and execute tests based on code context</p>
+                  </div>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p class="text-blue-800">
+                    <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                    <strong>Example:</strong> Ask your AI assistant to &#34;Find all usages of this function&#34; or
+                    &#34;Run tests for the current module and summarize failures&#34;
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div id="trading">
+              <h3 class="text-2xl font-bold text-slate-900 mb-6">MCP for AI-Powered Trading</h3>
+              <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                <p class="text-slate-700 mb-4">
+                  MCP serves as the communication layer between AI models and various financial data sources,
+                  analytical tools, and execution platforms for enhanced trading decision-making.
+                </p>
+
+                <div class="mb-6">
+                  <img src="https://kimi-web-img.moonshot.cn/img/simanaitissays.com/9474566109ff2e9674b47272d42bf36bc28accea.jpg" alt="Algorithmic trading server room" class="w-full h-32 object-cover rounded-lg" size="medium" aspect="wide" style="photo" query="algorithmic trading server room" referrerpolicy="no-referrer" data-modified="1" data-score="11596.00"/>
+                </div>
+
+                <div class="space-y-4 mb-6">
+                  <div class="flex items-start space-x-3">
+                    <i class="fas fa-chart-bar text-indigo-600 mt-1"></i>
+                    <div>
+                      <h4 class="font-semibold text-slate-900">Real-time Data</h4>
+                      <p class="text-slate-700 text-sm">Connect to market data feeds, news sources, economic indicators</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start space-x-3">
+                    <i class="fas fa-brain text-indigo-600 mt-1"></i>
+                    <div>
+                      <h4 class="font-semibold text-slate-900">AI Analysis</h4>
+                      <p class="text-slate-700 text-sm">Pattern recognition, risk assessment, signal generation</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start space-x-3">
+                    <i class="fas fa-cogs text-indigo-600 mt-1"></i>
+                    <div>
+                      <h4 class="font-semibold text-slate-900">Execution</h4>
+                      <p class="text-slate-700 text-sm">Trade execution with appropriate safeguards and user consent</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <p class="text-amber-800">
+                    <i class="fas fa-exclamation-triangle text-amber-600 mr-2"></i>
+                    <strong>Security Note:</strong> Trading applications require robust security and thorough testing.
+                    MCP&#39;s user consent mechanisms help ensure safe operation.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-12">
+            <div id="monetization">
+              <h3 class="text-2xl font-bold text-slate-900 mb-6">Monetizing MCP: Opportunities and Ideas</h3>
+              <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                <p class="text-slate-700 mb-6">
+                  The MCP ecosystem presents several avenues for monetization, both for developers creating MCP-related tools
+                  and for businesses looking to leverage MCP for commercial gain.
+                </p>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  <div class="benefit-card text-center">
+                    <i class="fas fa-server text-green-600 text-2xl mb-4"></i>
+                    <h4 class="font-bold text-slate-900 mb-2">Specialized MCP Servers</h4>
+                    <p class="text-slate-600 text-sm">Sell access to proprietary data or unique analytical tools</p>
+                  </div>
+                  <div class="benefit-card text-center">
+                    <i class="fas fa-robot text-blue-600 text-2xl mb-4"></i>
+                    <h4 class="font-bold text-slate-900 mb-2">MCP-Powered Apps</h4>
+                    <p class="text-slate-600 text-sm">Build and sell end-user AI applications for specific domains</p>
+                  </div>
+                  <div class="benefit-card text-center">
+                    <i class="fas fa-handshake text-purple-600 text-2xl mb-4"></i>
+                    <h4 class="font-bold text-slate-900 mb-2">Consulting Services</h4>
+                    <p class="text-slate-600 text-sm">Provide MCP implementation and integration services</p>
+                  </div>
+                  <div class="benefit-card text-center">
+                    <i class="fas fa-toolbox text-orange-600 text-2xl mb-4"></i>
+                    <h4 class="font-bold text-slate-900 mb-2">Toolkits &amp; Platforms</h4>
+                    <p class="text-slate-600 text-sm">Create developer tools that simplify MCP development</p>
+                  </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg">
+                  <h4 class="text-lg font-bold text-slate-900 mb-3">
+                    <i class="fas fa-lightbulb text-yellow-600 mr-2"></i>
+                    Business Model Innovation
+                  </h4>
+                  <p class="text-slate-700">
+                    Service providers can expose core functionalities as MCP tools, allowing customers to access services
+                    using their preferred MCP-compatible AI agent. This reduces provider LLM costs while giving users choice.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Advanced Concepts Section -->
+    <section id="advanced" class="py-16 bg-white">
+      <div class="container mx-auto px-8">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="serif text-4xl font-bold text-slate-900 mb-12 text-center">Advanced MCP Concepts and Tools</h2>
+
+          <p class="text-xl text-slate-600 text-center mb-12 max-w-4xl mx-auto">
+            As the MCP ecosystem matures, advanced concepts and tools are emerging to build increasingly sophisticated AI applications,
+            from comprehensive toolkits to self-healing systems.
+          </p>
+
+          <div class="grid lg:grid-cols-3 gap-8 mb-12">
+            <div id="toolkits" class="lg:col-span-1">
+              <h3 class="text-2xl font-bold text-slate-900 mb-6">MCP Toolkits and SDKs</h3>
+              <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <p class="text-slate-700 mb-4">
+                  Official SDKs are available for popular programming languages, providing pre-built components
+                  that abstract away low-level protocol details.
+                </p>
+
+                <div class="space-y-4 mb-6">
+                  <div class="flex items-center space-x-3">
+                    <i class="fab fa-python text-blue-600"></i>
+                    <span class="text-slate-900 font-medium">Python</span>
+                    <span class="text-slate-600 text-sm">FastMCP, mcp-sdk</span>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                    <i class="fab fa-js-square text-yellow-600"></i>
+                    <span class="text-slate-900 font-medium">TypeScript</span>
+                    <span class="text-slate-600 text-sm">Node.js environments</span>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                    <i class="fab fa-java text-red-600"></i>
+                    <span class="text-slate-900 font-medium">Java &amp; Kotlin</span>
+                    <span class="text-slate-600 text-sm">Enterprise applications</span>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                    <i class="fas fa-code text-purple-600"></i>
+                    <span class="text-slate-900 font-medium">C#</span>
+                    <span class="text-slate-600 text-sm">.NET ecosystem</span>
+                  </div>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p class="text-blue-800 text-sm">
+                    <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                    Third-party toolkits are emerging for common services,
+                    debugging, and specialized MCP components.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div id="agents" class="lg:col-span-2">
+              <h3 class="text-2xl font-bold text-slate-900 mb-6">Building AI Agents with MCP</h3>
+              <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <p class="text-slate-700 mb-6">
+                  MCP serves as a foundational technology for building sophisticated AI agents that can perform complex tasks
+                  by dynamically interacting with the external world through standardized interfaces.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <h4 class="text-lg font-bold text-slate-900 mb-3">Key Components</h4>
+                    <ul class="space-y-2 text-slate-700">
+                      <li><i class="fas fa-brain text-sky-600 mr-2"></i><strong>Core LLM:</strong> Reasoning and decision-making</li>
+                      <li><i class="fas fa-plug text-sky-600 mr-2"></i><strong>MCP Client:</strong> Communication with servers</li>
+                      <li><i class="fas fa-cogs text-sky-600 mr-2"></i><strong>Tool Orchestration:</strong> Logic for tool selection</li>
+                      <li><i class="fas fa-server text-sky-600 mr-2"></i><strong>MCP Servers:</strong> External capabilities</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 class="text-lg font-bold text-slate-900 mb-3">Capabilities</h4>
+                    <ul class="space-y-2 text-slate-700">
+                      <li><i class="fas fa-search text-sky-600 mr-2"></i>Multi-source research</li>
+                      <li><i class="fas fa-workflow text-sky-600 mr-2"></i>Multi-step workflows</li>
+                      <li><i class="fas fa-user-cog text-sky-600 mr-2"></i>Personalized assistance</li>
+                      <li><i class="fas fa-shield-alt text-sky-600 mr-2"></i>Safe operation with user control</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg">
+                  <p class="text-purple-800">
+                    <i class="fas fa-play-circle text-purple-600 mr-2"></i>
+                    Watch: <a href="https://youtu.be/GOHdTwKdT14?si=_h_F_0iEqJi7N2dK" class="citation">Building Next-Gen AI Agents with MCP + Claude</a>
+                    for practical workflows and patterns.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="self-healing" class="mb-12">
+            <h3 class="text-2xl font-bold text-slate-900 mb-6">Self-Healing Networks with MCP</h3>
+            <div class="bg-slate-50 p-8 rounded-xl border border-slate-200">
+              <p class="text-slate-700 mb-6">
+                Self-healing networks represent an advanced application where AI agents leverage MCP-connected tools
+                to monitor, diagnose, and remediate issues within network infrastructure autonomously.
+              </p>
+
+              <!-- Mermaid Diagram: Self-Healing Network Process -->
+              <div class="my-8 bg-white p-8 rounded-xl shadow-sm">
+                <h4 class="text-xl font-bold text-slate-900 mb-6 text-center">Self-Healing Network Process Flow</h4>
+                <div class="mermaid-container">
+                  <div class="mermaid-controls">
+                    <button class="mermaid-control-btn zoom-in" title="放大">
+                      <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button class="mermaid-control-btn zoom-out" title="缩小">
+                      <i class="fas fa-search-minus"></i>
+                    </button>
+                    <button class="mermaid-control-btn reset-zoom" title="重置">
+                      <i class="fas fa-expand-arrows-alt"></i>
+                    </button>
+                    <button class="mermaid-control-btn fullscreen" title="全屏查看">
+                      <i class="fas fa-expand"></i>
+                    </button>
+                  </div>
+                  <div class="mermaid" id="mermaid-diagram-2">
+                    sequenceDiagram
+                    participant A as AI Agent
+                    participant M1 as Monitor Server
+                    participant M2 as Diagnostic Server
+                    participant M3 as Remediation Server
+                    participant N as Network Devices
+
+                    A-&gt;&gt;M1: Monitor Network Status
+                    M1-&gt;&gt;N: Collect Device Status
+                    N--&gt;&gt;M1: Return Status Data
+                    M1--&gt;&gt;A: Report Anomalies
+
+                    alt Anomaly Detected
+                    A-&gt;&gt;M2: Diagnose Issue
+                    M2-&gt;&gt;N: Analyze Logs &amp; Traffic
+                    N--&gt;&gt;M2: Provide Analysis Data
+                    M2--&gt;&gt;A: Root Cause Analysis
+
+                    A-&gt;&gt;M3: Execute Remediation
+                    M3-&gt;&gt;N: Apply Configuration
+                    N--&gt;&gt;M3: Confirm Resolution
+                    M3--&gt;&gt;A: Remediation Result
+                    end
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid md:grid-cols-4 gap-4 mb-6">
+                <div class="text-center p-4 bg-white rounded-lg border border-slate-200">
+                  <i class="fas fa-eye text-blue-600 text-2xl mb-2"></i>
+                  <h4 class="font-bold text-slate-900 mb-1">Monitor</h4>
+                  <p class="text-slate-600 text-sm">Continuous status checking</p>
+                </div>
+                <div class="text-center p-4 bg-white rounded-lg border border-slate-200">
+                  <i class="fas fa-search text-orange-600 text-2xl mb-2"></i>
+                  <h4 class="font-bold text-slate-900 mb-1">Detect</h4>
+                  <p class="text-slate-600 text-sm">Anomaly identification</p>
+                </div>
+                <div class="text-center p-4 bg-white rounded-lg border border-slate-200">
+                  <i class="fas fa-stethoscope text-green-600 text-2xl mb-2"></i>
+                  <h4 class="font-bold text-slate-900 mb-1">Diagnose</h4>
+                  <p class="text-slate-600 text-sm">Root cause analysis</p>
+                </div>
+                <div class="text-center p-4 bg-white rounded-lg border border-slate-200">
+                  <i class="fas fa-wrench text-purple-600 text-2xl mb-2"></i>
+                  <h4 class="font-bold text-slate-900 mb-1">Remediate</h4>
+                  <p class="text-slate-600 text-sm">Automated correction</p>
+                </div>
+              </div>
+
+              <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p class="text-green-800">
+                  <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                  <strong>Benefits:</strong> Faster response times, reduced downtime, more efficient network operations,
+                  and improved resilience through AI-driven management.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Video Resources Section -->
+    <section id="videos" class="py-16 bg-slate-50">
+      <div class="container mx-auto px-8">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="serif text-4xl font-bold text-slate-900 mb-12 text-center">Video Resources and Tutorials</h2>
+
+          <p class="text-xl text-slate-600 text-center mb-12 max-w-4xl mx-auto">
+            These video resources provide deeper insights, practical demonstrations, and step-by-step guides
+            for understanding and implementing MCP in various contexts.
+          </p>
+
+          <!-- Featured Videos Grid -->
+          <div class="grid lg:grid-cols-2 gap-8 mb-12">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+              <h3 class="text-xl font-bold text-slate-900 mb-4">
+                <i class="fas fa-play-circle text-red-600 mr-2"></i>
+                Getting Started with MCP
+              </h3>
+              <div class="video-embed mb-4">
+                <iframe src="https://www.youtube.com/embed/e3MX7HoGXug" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="" class="w-full h-full"></iframe>
+              </div>
+              <p class="text-slate-700 mb-2">
+                <strong>Model Context Protocol (MCP), Clearly Explained</strong>
+              </p>
+              <p class="text-slate-600 text-sm">
+                Introductory explanation of MCP, its workings, and importance. Perfect for understanding the foundational concepts and why MCP matters.
+              </p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+              <h3 class="text-xl font-bold text-slate-900 mb-4">
+                <i class="fas fa-code text-blue-600 mr-2"></i>
+                Building MCP Servers
+              </h3>
+              <div class="video-embed mb-4">
+                <iframe src="https://www.youtube.com/embed/lbyPJqCI-tw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="" class="w-full h-full"></iframe>
+              </div>
+              <p class="text-slate-700 mb-2">
+                <strong>The ULTIMATE Guide to Building Your Own MCP Servers</strong>
+              </p>
+              <p class="text-slate-600 text-sm">
+                Comprehensive tutorial on MCP server development, including a free template. Step-by-step guide for creating custom MCP servers.
+              </p>
+            </div>
+          </div>
+
+          <!-- Video Resources Table -->
+          <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-red-600 to-orange-600 p-6">
+              <h3 class="text-2xl font-bold text-white">Complete Video Library</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-slate-50">
+                  <tr>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Video Title</th>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Key Focus</th>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Relevance</th>
+                    <th class="px-6 py-4 text-left font-semibold text-slate-900">Link</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 text-slate-900 font-medium">MCP Demo using Python, AI, and self-healing network</td>
+                    <td class="px-6 py-4 text-slate-700">Practical demo of MCP with Python for network automation</td>
+                    <td class="px-6 py-4 text-slate-700">Illustrates MCP for system interaction and diagnostics</td>
+                    <td class="px-6 py-4">
+                      <a href="https://youtu.be/4FEg4XU6yQ4?si=BxmNyUPqcwnjGGNw" class="citation text-sm">Watch Video</a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 text-slate-900 font-medium">MCP is All You Need - Samuel Colvin, Pydantic</td>
+                    <td class="px-6 py-4 text-slate-700">Discussion on MCP&#39;s significance and broad applicability</td>
+                    <td class="px-6 py-4 text-slate-700">Expert perspective on MCP as foundational solution</td>
+                    <td class="px-6 py-4">
+                      <a href="https://youtu.be/bmWZk9vTze0?si=Zsb83oHQm9pXaP-9" class="citation text-sm">Watch Video</a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 text-slate-900 font-medium">NEW MCP Toolkit for AI Coding Assistants</td>
+                    <td class="px-6 py-4 text-slate-700">MCP toolkit designed to enhance AI coding assistants</td>
+                    <td class="px-6 py-4 text-slate-700">Tools for boosting developer productivity via MCP</td>
+                    <td class="px-6 py-4">
+                      <a href="https://youtu.be/Q3bMYavB8XA?si=GFOq8RCJ_wJRPW_B" class="citation text-sm">Watch Video</a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 text-slate-900 font-medium">Building Next-Gen AI Agents with MCP + Claude</td>
+                    <td class="px-6 py-4 text-slate-700">Walkthrough of creating advanced AI agents</td>
+                    <td class="px-6 py-4 text-slate-700">Practical workflows for complex task execution</td>
+                    <td class="px-6 py-4">
+                      <a href="https://youtu.be/GOHdTwKdT14?si=_h_F_0iEqJi7N2dK" class="citation text-sm">Watch Video</a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 text-slate-900 font-medium">Build Anything with MCP Agents</td>
+                    <td class="px-6 py-4 text-slate-700">Guide on versatility of MCP for diverse AI agents</td>
+                    <td class="px-6 py-4 text-slate-700">Methodologies for various MCP-based agent types</td>
+                    <td class="px-6 py-4">
+                      <a href="https://youtu.be/L94WBLL0KjY?si=m5oGaluyZPGm5Hje" class="citation text-sm">Watch Video</a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 text-slate-900 font-medium">Build Custom MCP Server - Python Tutorial</td>
+                    <td class="px-6 py-4 text-slate-700">Focused Python tutorial for custom MCP servers</td>
+                    <td class="px-6 py-4 text-slate-700">Hands-on guide for Python developers</td>
+                    <td class="px-6 py-4">
+                      <a href="https://youtu.be/-8k9lGpGQ6g?si=NBthWi-LBYZbiQi8" class="citation text-sm">Watch Video</a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 text-slate-900 font-medium">Learn MCP Servers with Python (EASY)</td>
+                    <td class="px-6 py-4 text-slate-700">Beginner-friendly Python tutorial for MCP</td>
+                    <td class="px-6 py-4 text-slate-700">Simplified introduction to basic MCP servers</td>
+                    <td class="px-6 py-4">
+                      <a href="https://www.youtube.com/watch?v=Ek8JHgZtmcI&amp;ab_channel=AlejandroAO-Software%26Ai" class="citation text-sm">Watch Video</a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="mt-12 bg-gradient-to-r from-blue-50 to-purple-50 p-8 rounded-xl">
+            <h3 class="text-2xl font-bold text-slate-900 mb-4">
+              <i class="fas fa-lightbulb text-yellow-600 mr-2"></i>
+              Learning Path Recommendation
+            </h3>
+            <div class="grid md:grid-cols-3 gap-6">
+              <div class="text-center">
+                <div class="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-lg font-bold mx-auto mb-3">1</div>
+                <h4 class="font-bold text-slate-900 mb-2">Start with Basics</h4>
+                <p class="text-slate-700 text-sm">Watch &#34;MCP Clearly Explained&#34; to understand core concepts</p>
+              </div>
+              <div class="text-center">
+                <div class="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-lg font-bold mx-auto mb-3">2</div>
+                <h4 class="font-bold text-slate-900 mb-2">Build Your First Server</h4>
+                <p class="text-slate-700 text-sm">Follow &#34;Learn MCP Servers with Python&#34; for hands-on experience</p>
+              </div>
+              <div class="text-center">
+                <div class="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-lg font-bold mx-auto mb-3">3</div>
+                <h4 class="font-bold text-slate-900 mb-2">Advanced Applications</h4>
+                <p class="text-slate-700 text-sm">Explore agent building and specialized use cases</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-12">
+      <div class="container mx-auto px-8">
+        <div class="max-w-4xl mx-auto text-center">
+          <h3 class="text-2xl font-bold mb-4">Model Context Protocol Documentation</h3>
+          <p class="text-slate-300 mb-6">
+            Comprehensive guide to understanding, implementing, and leveraging MCP for AI applications
+          </p>
+          <div class="flex justify-center space-x-6 text-sm">
+            <a href="https://github.com/modelcontextprotocol" class="text-slate-300 hover:text-white">GitHub Repository</a>
+            <a href="https://modelcontextprotocol.io" class="text-slate-300 hover:text-white">Official Documentation</a>
+            <a href="https://docs.anthropic.com/en/docs/mcp" class="text-slate-300 hover:text-white">Anthropic MCP Guide</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Mobile Menu Toggle -->
+  <button id="mobile-menu-toggle" class="fixed top-4 left-4 z-50 lg:hidden bg-sky-600 text-white p-3 rounded-full shadow-lg">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <script>
+      // Initialize Mermaid
+      mermaid.initialize({ 
+          startOnLoad: true,
+          theme: 'default',
+          themeVariables: {
+              primaryColor: '#0ea5e9',
+              primaryTextColor: '#1f2937',
+              primaryBorderColor: '#0284c7',
+              lineColor: '#64748b',
+              secondaryColor: '#f8fafc',
+              tertiaryColor: '#e2e8f0',
+              background: '#ffffff',
+              mainBkg: '#ffffff',
+              secondaryBkg: '#f1f5f9',
+              tertiaryBkg: '#e2e8f0',
+              // Ensure good contrast for different node types
+              cScale0: '#e3f2fd',
+              cScale1: '#f3e5f5', 
+              cScale2: '#e8f5e8',
+              cScale3: '#fff3e0',
+              cScale4: '#f0f9ff',
+              // Text colors for contrast
+              cScale0Text: '#1f2937',
+              cScale1Text: '#1f2937',
+              cScale2Text: '#1f2937', 
+              cScale3Text: '#1f2937',
+              cScale4Text: '#1f2937'
+          },
+          flowchart: {
+              useMaxWidth: true,
+              htmlLabels: true,
+              curve: 'basis',
+              padding: 20
+          },
+          sequence: {
+              useMaxWidth: true,
+              wrap: true,
+              width: 150,
+              height: 65,
+              boxMargin: 10,
+              boxTextMargin: 5,
+              noteMargin: 10,
+              messageMargin: 35
+          }
+      });
+
+      // Initialize Mermaid Controls for zoom and pan
+      function initializeMermaidControls() {
+          const containers = document.querySelectorAll('.mermaid-container');
+
+          containers.forEach(container => {
+          const mermaidElement = container.querySelector('.mermaid');
+          let scale = 1;
+          let isDragging = false;
+          let startX, startY, translateX = 0, translateY = 0;
+
+          // 触摸相关状态
+          let isTouch = false;
+          let touchStartTime = 0;
+          let initialDistance = 0;
+          let initialScale = 1;
+          let isPinching = false;
+
+          // Zoom controls
+          const zoomInBtn = container.querySelector('.zoom-in');
+          const zoomOutBtn = container.querySelector('.zoom-out');
+          const resetBtn = container.querySelector('.reset-zoom');
+          const fullscreenBtn = container.querySelector('.fullscreen');
+
+          function updateTransform() {
+              mermaidElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+
+              if (scale > 1) {
+              container.classList.add('zoomed');
+              } else {
+              container.classList.remove('zoomed');
+              }
+
+              mermaidElement.style.cursor = isDragging ? 'grabbing' : 'grab';
+          }
+
+          if (zoomInBtn) {
+              zoomInBtn.addEventListener('click', () => {
+              scale = Math.min(scale * 1.25, 4);
+              updateTransform();
+              });
+          }
+
+          if (zoomOutBtn) {
+              zoomOutBtn.addEventListener('click', () => {
+              scale = Math.max(scale / 1.25, 0.3);
+              if (scale <= 1) {
+                  translateX = 0;
+                  translateY = 0;
+              }
+              updateTransform();
+              });
+          }
+
+          if (resetBtn) {
+              resetBtn.addEventListener('click', () => {
+              scale = 1;
+              translateX = 0;
+              translateY = 0;
+              updateTransform();
+              });
+          }
+
+          if (fullscreenBtn) {
+              fullscreenBtn.addEventListener('click', () => {
+              if (container.requestFullscreen) {
+                  container.requestFullscreen();
+              } else if (container.webkitRequestFullscreen) {
+                  container.webkitRequestFullscreen();
+              } else if (container.msRequestFullscreen) {
+                  container.msRequestFullscreen();
+              }
+              });
+          }
+
+          // Mouse Events
+          mermaidElement.addEventListener('mousedown', (e) => {
+              if (isTouch) return; // 如果是触摸设备，忽略鼠标事件
+
+              isDragging = true;
+              startX = e.clientX - translateX;
+              startY = e.clientY - translateY;
+              mermaidElement.style.cursor = 'grabbing';
+              updateTransform();
+              e.preventDefault();
+          });
+
+          document.addEventListener('mousemove', (e) => {
+              if (isDragging && !isTouch) {
+              translateX = e.clientX - startX;
+              translateY = e.clientY - startY;
+              updateTransform();
+              }
+          });
+
+          document.addEventListener('mouseup', () => {
+              if (isDragging && !isTouch) {
+              isDragging = false;
+              mermaidElement.style.cursor = 'grab';
+              updateTransform();
+              }
+          });
+
+          document.addEventListener('mouseleave', () => {
+              if (isDragging && !isTouch) {
+              isDragging = false;
+              mermaidElement.style.cursor = 'grab';
+              updateTransform();
+              }
+          });
+
+          // 获取两点之间的距离
+          function getTouchDistance(touch1, touch2) {
+              return Math.hypot(
+              touch2.clientX - touch1.clientX,
+              touch2.clientY - touch1.clientY
+              );
+          }
+
+          // Touch Events - 触摸事件处理
+          mermaidElement.addEventListener('touchstart', (e) => {
+              isTouch = true;
+              touchStartTime = Date.now();
+
+              if (e.touches.length === 1) {
+              // 单指拖动
+              isPinching = false;
+              isDragging = true;
+
+              const touch = e.touches[0];
+              startX = touch.clientX - translateX;
+              startY = touch.clientY - translateY;
+
+              } else if (e.touches.length === 2) {
+              // 双指缩放
+              isPinching = true;
+              isDragging = false;
+
+              const touch1 = e.touches[0];
+              const touch2 = e.touches[1];
+              initialDistance = getTouchDistance(touch1, touch2);
+              initialScale = scale;
+              }
+
+              e.preventDefault();
+          }, { passive: false });
+
+          mermaidElement.addEventListener('touchmove', (e) => {
+              if (e.touches.length === 1 && isDragging && !isPinching) {
+              // 单指拖动
+              const touch = e.touches[0];
+              translateX = touch.clientX - startX;
+              translateY = touch.clientY - startY;
+              updateTransform();
+
+              } else if (e.touches.length === 2 && isPinching) {
+              // 双指缩放
+              const touch1 = e.touches[0];
+              const touch2 = e.touches[1];
+              const currentDistance = getTouchDistance(touch1, touch2);
+
+              if (initialDistance > 0) {
+                  const newScale = Math.min(Math.max(
+                  initialScale * (currentDistance / initialDistance),
+                  0.3
+                  ), 4);
+                  scale = newScale;
+                  updateTransform();
+              }
+              }
+
+              e.preventDefault();
+          }, { passive: false });
+
+          mermaidElement.addEventListener('touchend', (e) => {
+              // 重置状态
+              if (e.touches.length === 0) {
+              isDragging = false;
+              isPinching = false;
+              initialDistance = 0;
+
+              // 延迟重置isTouch，避免鼠标事件立即触发
+              setTimeout(() => {
+                  isTouch = false;
+              }, 100);
+              } else if (e.touches.length === 1 && isPinching) {
+              // 从双指变为单指，切换为拖动模式
+              isPinching = false;
+              isDragging = true;
+
+              const touch = e.touches[0];
+              startX = touch.clientX - translateX;
+              startY = touch.clientY - translateY;
+              }
+
+              updateTransform();
+          });
+
+          mermaidElement.addEventListener('touchcancel', (e) => {
+              isDragging = false;
+              isPinching = false;
+              initialDistance = 0;
+
+              setTimeout(() => {
+              isTouch = false;
+              }, 100);
+
+              updateTransform();
+          });
+
+          // Enhanced wheel zoom with better center point handling
+          container.addEventListener('wheel', (e) => {
+              e.preventDefault();
+              const rect = container.getBoundingClientRect();
+              const centerX = rect.width / 2;
+              const centerY = rect.height / 2;
+
+              const delta = e.deltaY > 0 ? 0.9 : 1.1;
+              const newScale = Math.min(Math.max(scale * delta, 0.3), 4);
+
+              // Adjust translation to zoom towards center
+              if (newScale !== scale) {
+              const scaleDiff = newScale / scale;
+              translateX = translateX * scaleDiff;
+              translateY = translateY * scaleDiff;
+              scale = newScale;
+
+              if (scale <= 1) {
+                  translateX = 0;
+                  translateY = 0;
+              }
+
+              updateTransform();
+              }
+          });
+
+          // Initialize display
+          updateTransform();
+          });
+      }
+
+      // Wait for mermaid to render, then initialize controls
+      setTimeout(initializeMermaidControls, 1000);
+
+      // Mobile menu toggle
+      document.getElementById('mobile-menu-toggle').addEventListener('click', function() {
+          document.querySelector('.toc-sidebar').classList.toggle('open');
+      });
+
+      // Smooth scrolling for TOC links
+      document.querySelectorAll('.toc-link').forEach(link => {
+          link.addEventListener('click', function(e) {
+              e.preventDefault();
+              const targetId = this.getAttribute('href').substring(1);
+              const targetElement = document.getElementById(targetId);
+              if (targetElement) {
+                  // Close mobile menu if open
+                  document.querySelector('.toc-sidebar').classList.remove('open');
+                  
+                  targetElement.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start'
+                  });
+              }
+          });
+      });
+
+      // Active link highlighting
+      function updateActiveLink() {
+          const sections = document.querySelectorAll('section[id], div[id]');
+          const tocLinks = document.querySelectorAll('.toc-link');
+          
+          let current = '';
+          sections.forEach(section => {
+              const sectionTop = section.offsetTop - 100;
+              if (window.pageYOffset >= sectionTop) {
+                  current = section.getAttribute('id');
+              }
+          });
+
+          tocLinks.forEach(link => {
+              link.classList.remove('active');
+              if (link.getAttribute('href') === '#' + current) {
+                  link.classList.add('active');
+              }
+          });
+      }
+
+      window.addEventListener('scroll', updateActiveLink);
+      window.addEventListener('load', updateActiveLink);
+
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', function(e) {
+          const sidebar = document.querySelector('.toc-sidebar');
+          const toggle = document.getElementById('mobile-menu-toggle');
+          
+          if (window.innerWidth <= 1024 && 
+              !sidebar.contains(e.target) && 
+              !toggle.contains(e.target)) {
+              sidebar.classList.remove('open');
+          }
+      });
+
+      // Reset sidebar state on window resize
+      window.addEventListener('resize', function() {
+          const sidebar = document.querySelector('.toc-sidebar');
+          if (window.innerWidth > 1024) {
+              sidebar.classList.remove('open');
+          }
+      });
+  </script>
+
+
+</body></html>
