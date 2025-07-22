@@ -589,6 +589,42 @@
           }
       }
       
+      /* Enhanced Mermaid Animations */
+      .mermaid.flow-animation .edgePath .path {
+          stroke-dasharray: 5;
+          animation: dash 2s linear infinite;
+      }
+      
+      .mermaid.highlight-paths .edgePath .path {
+          stroke: #3b82f6 !important;
+          stroke-width: 3px !important;
+          filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.5));
+      }
+      
+      .mermaid.highlight-paths .node rect,
+      .mermaid.highlight-paths .node circle,
+      .mermaid.highlight-paths .node ellipse {
+          filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
+      }
+      
+      @keyframes dash {
+          to {
+              stroke-dashoffset: -10;
+          }
+      }
+      
+      /* Interactive node hover effects */
+      .mermaid .node:hover rect,
+      .mermaid .node:hover circle,
+      .mermaid .node:hover ellipse {
+          filter: brightness(1.1) drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+          cursor: pointer;
+      }
+      
+      .mermaid .node:hover .label {
+          font-weight: 700 !important;
+      }
+      
       /* Reduced motion support */
       @media (prefers-reduced-motion: reduce) {
           *,
@@ -604,6 +640,10 @@
           }
           
           svg * {
+              animation: none !important;
+          }
+          
+          .mermaid.flow-animation .edgePath .path {
               animation: none !important;
           }
       }
@@ -1701,6 +1741,7 @@
             <!-- Mermaid Diagram: MCP Architecture Overview -->
             <div class="my-12 bg-slate-50 p-8 rounded-xl">
               <h3 class="text-2xl font-bold text-slate-900 mb-6 text-center">MCP Architecture Overview</h3>
+              <p class="text-center text-slate-600 mb-6">Complete data flow from AI application through MCP protocol to external services</p>
               <div class="mermaid-container">
                 <div class="mermaid-controls">
                   <button class="mermaid-control-btn zoom-in" title="放大">
@@ -1717,28 +1758,143 @@
                   </button>
                 </div>
                 <div class="mermaid" id="mermaid-diagram-1">
-                  graph TD
-                  A[&#34;LLM Application&#34;] --&gt; B[&#34;MCP Client&#34;]
-                  B --&gt; C[&#34;MCP Server 1
-                  <br/>Database Tools&#34;]
-                  B --&gt; D[&#34;MCP Server 2
-                  <br/>File System&#34;]
-                  B --&gt; E[&#34;MCP Server 3
-                  <br/>External APIs&#34;]
-                  C --&gt; F[&#34;PostgreSQL Database&#34;]
-                  D --&gt; G[&#34;Local Filesystem&#34;]
-                  E --&gt; H[&#34;Weather API&#34;]
-                  E --&gt; I[&#34;Email Service&#34;]
+                  graph TB
+                  subgraph "Standard RPC 2.0"
+                    RPC[📋 JSON-RPC 2.0<br/>Standard Protocol]
+                  end
+                  
+                  subgraph "MCP Layer"
+                    SEC[🔒 Security Layer<br/>Auth & Permissions]
+                    ROUTER[🔄 Message Router<br/>Request/Response]
+                  end
+                  
+                  subgraph "Server Side"
+                    S1[📧 MCP Server 1<br/>Email Tools]
+                    S2[🗄️ MCP Server 2<br/>Database Tools]  
+                    S3[📁 MCP Server 3<br/>File System]
+                    S4[🌐 MCP Server 4<br/>Web APIs]
+                  end
+                  
+                  subgraph "External Services"
+                    GMAIL[📮 Gmail API]
+                    DB[🐘 PostgreSQL]
+                    FILES[📂 Local Files]
+                    API[🌍 REST APIs]
+                  end
+                  
+                  A[🤖 LLM Application<br/>Claude, GPT, etc.] --> B[📡 MCP Client<br/>Protocol Handler]
+                  B --> RPC
+                  RPC --> SEC
+                  SEC --> ROUTER
+                  
+                  ROUTER --> S1
+                  ROUTER --> S2
+                  ROUTER --> S3
+                  ROUTER --> S4
+                  
+                  S1 --> GMAIL
+                  S2 --> DB
+                  S3 --> FILES
+                  S4 --> API
+                  
+                  %% Return paths (dotted lines)
+                  GMAIL -.-> S1
+                  DB -.-> S2
+                  FILES -.-> S3
+                  API -.-> S4
+                  
+                  S1 -.-> ROUTER
+                  S2 -.-> ROUTER
+                  S3 -.-> ROUTER
+                  S4 -.-> ROUTER
+                  
+                  ROUTER -.-> SEC
+                  SEC -.-> RPC
+                  RPC -.-> B
+                  B -.-> A
 
                   style A fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#1f2937
                   style B fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px,color:#1f2937
-                  style C fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#1f2937
-                  style D fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#1f2937
-                  style E fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#1f2937
-                  style F fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#1f2937
-                  style G fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#1f2937
-                  style H fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#1f2937
-                  style I fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#1f2937
+                  style RPC fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#1f2937
+                  style SEC fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#1f2937
+                  style ROUTER fill:#f0f9ff,stroke:#0284c7,stroke-width:2px,color:#1f2937
+                  style S1 fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#1f2937
+                  style S2 fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#1f2937
+                  style S3 fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#1f2937
+                  style S4 fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#1f2937
+                  style GMAIL fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#1f2937
+                  style DB fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#1f2937
+                  style FILES fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#1f2937
+                  style API fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#1f2937
+                </div>
+              </div>
+              
+              <!-- Architecture Legend -->
+              <div class="mt-8 bg-white p-6 rounded-lg border border-slate-200">
+                <h4 class="text-lg font-semibold text-slate-900 mb-4">Architecture Components Legend</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                  <div class="flex items-center space-x-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #e3f2fd; border: 2px solid #1976d2;"></div>
+                    <span>AI Applications</span>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #f3e5f5; border: 2px solid #7b1fa2;"></div>
+                    <span>MCP Clients</span>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #fff3e0; border: 2px solid #f57c00;"></div>
+                    <span>Protocol Layer</span>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #e8f5e8; border: 2px solid #388e3c;"></div>
+                    <span>MCP Servers</span>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #fef3c7; border: 2px solid #f59e0b;"></div>
+                    <span>External Services</span>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #ffebee; border: 2px solid #d32f2f;"></div>
+                    <span>Security Layer</span>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #f0f9ff; border: 2px solid #0284c7;"></div>
+                    <span>Message Router</span>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span>→</span>
+                    <span>Request Flow</span>
+                    <span style="margin-left: 1rem;">⇢</span>
+                    <span>Response Flow</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- What's New Section -->
+              <div class="mt-8 bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg border border-green-200">
+                <h4 class="text-lg font-semibold text-green-900 mb-3">
+                  <i class="fas fa-sparkles mr-2"></i>
+                  Enhanced Visual Features
+                </h4>
+                <div class="grid md:grid-cols-2 gap-4 text-sm text-green-800">
+                  <div>
+                    <h5 class="font-semibold mb-2">Interactive Components:</h5>
+                    <ul class="space-y-1">
+                      <li>• Click on diagram components for detailed information</li>
+                      <li>• Enhanced zoom and pan controls for all diagrams</li>
+                      <li>• Touch-friendly mobile interactions</li>
+                      <li>• Fullscreen viewing mode</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h5 class="font-semibold mb-2">Visual Improvements:</h5>
+                    <ul class="space-y-1">
+                      <li>• Complete bidirectional data flow visualization</li>
+                      <li>• Comprehensive component relationship mapping</li>
+                      <li>• Color-coded architecture layers</li>
+                      <li>• Animated flow demonstrations</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1824,7 +1980,11 @@
                   </button>
                 </div>
                 <div class="mermaid" id="mermaid-diagram-components">
-                  graph LR
+                  graph TB
+                  subgraph "User Layer"
+                    U[👤 User<br/>Makes Requests]
+                  end
+                  
                   subgraph "Client Side"
                     A[AI Application<br/>🤖 Claude, GPT, etc.]
                     B[MCP Client<br/>📡 Protocol Handler]
@@ -1835,6 +1995,8 @@
                     D[Protocol Standard<br/>📋 JSON-RPC 2.0]
                     E[Security Layer<br/>🔒 Auth & Permissions]
                     F[Message Router<br/>🔄 Request/Response]
+                    P[Resource Manager<br/>📄 Context & Files]
+                    Q[Tool Registry<br/>🛠️ Available Functions]
                   end
                   
                   subgraph "Server Side"
@@ -1849,33 +2011,79 @@
                     L[PostgreSQL<br/>🐘]
                     M[Local Files<br/>📂]
                     N[REST APIs<br/>🌍]
+                    O[Cloud Storage<br/>☁️]
                   end
 
+                  %% User interactions
+                  U --> C
                   C --> A
+                  
+                  %% Client to MCP Layer
                   A --> B
                   B --> D
+                  B --> E
+                  B --> F
+                  B --> P
+                  B --> Q
+                  
+                  %% MCP Layer internal connections
                   D --> E
                   E --> F
+                  F --> P
+                  F --> Q
+                  
+                  %% MCP Layer to Servers
                   F --> G
                   F --> H
                   F --> I
                   F --> J
+                  
+                  %% Servers to External Services
                   G --> K
                   H --> L
                   I --> M
+                  I --> O
                   J --> N
+                  
+                  %% Bidirectional feedback
+                  K -.-> G
+                  L -.-> H
+                  M -.-> I
+                  O -.-> I
+                  N -.-> J
+                  
+                  G -.-> F
+                  H -.-> F
+                  I -.-> F
+                  J -.-> F
+                  
+                  F -.-> B
+                  B -.-> A
+                  A -.-> C
+                  C -.-> U
 
                   click A "javascript:showComponentDetails('ai-app')"
                   click B "javascript:showComponentDetails('mcp-client')"
                   click G "javascript:showComponentDetails('email-server')"
                   click H "javascript:showComponentDetails('db-server')"
+                  click I "javascript:showComponentDetails('file-server')"
+                  click J "javascript:showComponentDetails('api-server')"
+                  click D "javascript:showComponentDetails('protocol')"
+                  click E "javascript:showComponentDetails('security')"
 
+                  style U fill:#fef3c7,stroke:#f59e0b,stroke-width:3px,color:#1f2937
                   style A fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#1f2937
                   style B fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px,color:#1f2937
                   style C fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#1f2937
                   style D fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#1f2937
                   style E fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#1f2937
                   style F fill:#f0f9ff,stroke:#0284c7,stroke-width:2px,color:#1f2937
+                  style P fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#1f2937
+                  style Q fill:#fdf4ff,stroke:#a855f7,stroke-width:2px,color:#1f2937
+                  style G fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#1f2937
+                  style H fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#1f2937
+                  style I fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#1f2937
+                  style J fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#1f2937
                 </div>
               </div>
               
@@ -1898,6 +2106,102 @@
                   </button>
                   <button class="mermaid-control-btn zoom-out" title="Zoom Out">
                     <i class="fas fa-search-minus"></i>
+                  </button>
+                  <button class="mermaid-control-btn reset-zoom" title="Reset View">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                  </button>
+                  <button class="mermaid-control-btn fullscreen" title="Fullscreen">
+                    <i class="fas fa-expand"></i>
+                  </button>
+                </div>
+                <div class="mermaid" id="mermaid-diagram-ecosystem">
+                  graph TB
+                  subgraph "Development Tools"
+                    IDE[🔧 IDE Integration<br/>VS Code, Cursor]
+                    GIT[📝 Git Operations<br/>Commits, PRs, Issues]
+                    CI[🚀 CI/CD Pipeline<br/>Build, Test, Deploy]
+                  end
+                  
+                  subgraph "Business Applications"
+                    CRM[👥 CRM Systems<br/>Salesforce, HubSpot]
+                    EMAIL[📧 Email Marketing<br/>Mailchimp, SendGrid]
+                    SLACK[💬 Team Chat<br/>Slack, Discord, Teams]
+                  end
+                  
+                  subgraph "Data & Analytics"
+                    DB[🗄️ Databases<br/>PostgreSQL, MongoDB]
+                    ANALYTICS[📊 Analytics<br/>Google Analytics, Mixpanel]
+                    BI[📈 Business Intelligence<br/>Tableau, PowerBI]
+                  end
+                  
+                  subgraph "Cloud & Infrastructure"
+                    AWS[☁️ AWS Services<br/>S3, Lambda, RDS]
+                    DOCKER[🐳 Containerization<br/>Docker, Kubernetes]
+                    MONITOR[📡 Monitoring<br/>DataDog, New Relic]
+                  end
+                  
+                  subgraph "AI & Automation"
+                    N8N[🔄 n8n Workflows<br/>Process Automation]
+                    ZAPIER[⚡ Zapier Integration<br/>App Connections]
+                    ML[🤖 ML Platforms<br/>TensorFlow, PyTorch]
+                  end
+                  
+                  MCP[🌟 MCP Protocol<br/>Universal Connector]
+                  
+                  %% Development connections
+                  MCP --> IDE
+                  MCP --> GIT
+                  MCP --> CI
+                  
+                  %% Business connections
+                  MCP --> CRM
+                  MCP --> EMAIL
+                  MCP --> SLACK
+                  
+                  %% Data connections
+                  MCP --> DB
+                  MCP --> ANALYTICS
+                  MCP --> BI
+                  
+                  %% Cloud connections
+                  MCP --> AWS
+                  MCP --> DOCKER
+                  MCP --> MONITOR
+                  
+                  %% Automation connections
+                  MCP --> N8N
+                  MCP --> ZAPIER
+                  MCP --> ML
+                  
+                  %% Cross-category integrations
+                  IDE -.-> GIT
+                  GIT -.-> CI
+                  CRM -.-> EMAIL
+                  DB -.-> ANALYTICS
+                  ANALYTICS -.-> BI
+                  AWS -.-> DOCKER
+                  DOCKER -.-> MONITOR
+                  N8N -.-> ZAPIER
+                  
+                  style MCP fill:#fef3c7,stroke:#f59e0b,stroke-width:4px,color:#1f2937
+                  style IDE fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#1f2937
+                  style GIT fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#1f2937
+                  style CI fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#1f2937
+                  style CRM fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#1f2937
+                  style EMAIL fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#1f2937
+                  style SLACK fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#1f2937
+                  style DB fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#1f2937
+                  style ANALYTICS fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#1f2937
+                  style BI fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#1f2937
+                  style AWS fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#1f2937
+                  style DOCKER fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#1f2937
+                  style MONITOR fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#1f2937
+                  style N8N fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#1f2937
+                  style ZAPIER fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#1f2937
+                  style ML fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#1f2937
+                </div>
+              </div>
+            </div>
                   </button>
                   <button class="mermaid-control-btn reset-zoom" title="Reset View">
                     <i class="fas fa-expand-arrows-alt"></i>
@@ -10963,7 +11267,10 @@ npm start</code></pre>
       }
 
       // Wait for mermaid to render, then initialize controls
-      setTimeout(initializeMermaidControls, 1000);
+      setTimeout(() => {
+          initializeMermaidControls();
+          initializeEnhancedMermaidControls();
+      }, 1000);
 
       // Mobile menu toggle
       document.getElementById('mobile-menu-toggle').addEventListener('click', function() {
@@ -11135,6 +11442,46 @@ npm start</code></pre>
                       '• Support for PostgreSQL, MySQL, SQLite',
                       '• Schema introspection and validation',
                       '• Transaction management and rollback support'
+                  ]
+              },
+              'file-server': {
+                  title: '📁 File System MCP Server',
+                  description: 'Server that provides secure file system access and management capabilities.',
+                  features: [
+                      '• Read, write, and manage local files',
+                      '• Directory traversal and file search',
+                      '• File type detection and validation',
+                      '• Permission management and access control'
+                  ]
+              },
+              'api-server': {
+                  title: '🌐 Web API MCP Server',
+                  description: 'Server that provides access to external web APIs and REST services.',
+                  features: [
+                      '• HTTP request handling (GET, POST, PUT, DELETE)',
+                      '• Authentication token management',
+                      '• Response parsing and error handling',
+                      '• Rate limiting and retry logic'
+                  ]
+              },
+              'protocol': {
+                  title: '📋 JSON-RPC 2.0 Protocol',
+                  description: 'The standardized communication protocol that enables interoperability between all MCP components.',
+                  features: [
+                      '• Standardized request/response format',
+                      '• Error handling and status codes',
+                      '• Batch request support',
+                      '• Notification and callback mechanisms'
+                  ]
+              },
+              'security': {
+                  title: '🔒 Security Layer',
+                  description: 'Comprehensive security framework that protects all MCP communications and operations.',
+                  features: [
+                      '• Authentication and authorization',
+                      '• Permission-based access control',
+                      '• Request validation and sanitization',
+                      '• Audit logging and monitoring'
                   ]
               }
           };
